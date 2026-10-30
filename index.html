@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Колибри — Студия декора и праздника | Ачинск</title>
+<meta name="description" content="Студия «Колибри» в Ачинске: гелиевые шары, фотозоны, свадьбы, выписки, выпускные. Дуем шары и создаём воздушные истории. ул. Красноярская, 30.">
+<meta name="theme-color" content="#F0F8FF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js" defer></script>
+<style>
+:root{
+  --bg:#F0F8FF;--bg2:#E6E6FA;--white:#fff;
+  --marsala:#8A2846;--marsala2:#6B1E36;--plum:#602749;
+  --lilac:#C8D6E5;--cyan:#00E5FF;--magenta:#E05FA0;
+  --gold:#D4AF37;
+  --text:#1A1A1A;--soft:#5C5550;--muted:#9A918A;
+  --line:rgba(26,26,26,.08);--glass:rgba(255,255,255,.85);
+  --shadow:0 18px 50px rgba(0,0,0,.08);
+  --shadow2:0 32px 80px rgba(0,0,0,.12);
+  --r:28px;--max:1440px;--hh:72px;
+  --font-d:'Playfair Display',Georgia,serif;
+  --font-b:'Inter',system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.5;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.is-locked{overflow:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{border:none;background:none;cursor:pointer}
+img{display:block;max-width:100%;height:auto}
+.container{width:min(100% - 32px,var(--max));margin-inline:auto}
+@media(min-width:900px){.container{width:min(100% - 64px,var(--max))}}
+
+/* Loader */
+.loader{position:fixed;inset:0;z-index:10000;background:var(--bg);display:grid;place-items:center;transition:opacity .6s var(--ease),visibility .6s}
+.loader.hide{opacity:0;visibility:hidden;pointer-events:none}
+.loader-mark{font-family:var(--font-d);font-size:42px;color:var(--marsala);letter-spacing:-.02em}
+.loader-mark em{font-style:italic;color:var(--plum)}
+.loader-bar{width:120px;height:2px;background:rgba(138,40,70,.12);margin-top:18px;border-radius:2px;overflow:hidden}
+.loader-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--marsala),var(--gold));animation:load 1.1s var(--ease) forwards}
+@keyframes load{to{width:100%}}
+
+/* Cursor — только desktop */
+.cursor-dot,.cursor-ring{display:none}
+@media(pointer:fine){
+  body.has-cursor{cursor:none}
+  body.has-cursor a,body.has-cursor button{cursor:none}
+  .cursor-dot,.cursor-ring{display:block;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;border-radius:50%;transform:translate(-50%,-50%)}
+  .cursor-dot{width:7px;height:7px;background:var(--marsala)}
+  .cursor-ring{width:38px;height:38px;border:1.5px solid rgba(138,40,70,.35);transition:width .3s var(--ease),height .3s var(--ease),background .3s,border-color .3s}
+  body.is-hover .cursor-dot{width:0;height:0}
+  body.is-hover .cursor-ring{width:58px;height:58px;background:rgba(138,40,70,.08);border-color:var(--marsala)}
+}
+
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(120px);opacity:.3;will-change:transform}
+.blob.a{width:500px;height:500px;background:var(--lilac);top:-140px;right:-100px}
+.blob.b{width:400px;height:400px;background:var(--cyan);bottom:15%;left:-120px}
+.page{position:relative;z-index:1}
+
+/* Header */
+.header{position:fixed;top:0;left:0;right:0;z-index:900;height:var(--hh);border-bottom:1px solid transparent;background:rgba(255,255,255,.2);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:background .35s,backdrop-filter .35s,border-color .35s,box-shadow .35s}
+.header.on{background:var(--glass);backdrop-filter:blur(18px) saturate(1.15);-webkit-backdrop-filter:blur(18px) saturate(1.15);border-bottom-color:var(--line);box-shadow:0 8px 30px rgba(96,39,73,.06)}
+.header-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-family:var(--font-b);font-size:clamp(18px,2.5vw,24px);font-weight:800;letter-spacing:-.01em;z-index:2;color:#8A2846;text-shadow:0 2px 10px rgba(255,255,255,.8)}
+.logo em{font-style:normal;color:#8A2846}
+.nav-desk{display:none;gap:28px}
+@media(min-width:920px){.nav-desk{display:flex}}
+.nav-desk a{font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);transition:color .25s}
+.nav-desk a:hover{color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.actions{display:flex;align-items:center;gap:4px}
+.icon-btn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:var(--text);position:relative;transition:background .25s,color .25s}
+.icon-btn:hover{background:rgba(138,40,70,.08);color:var(--marsala)}
+.icon-btn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.cart-count{position:absolute;top:5px;right:5px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:var(--marsala);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;transform:scale(0);transition:transform .3s var(--ease)}
+.cart-count.show{transform:scale(1)}
+.burger span{display:block;width:17px;height:1.5px;background:currentColor;margin:4px 0;border-radius:2px;transition:.3s var(--ease)}
+.burger.on span:nth-child(1){transform:translateY(5.5px) rotate(45deg)}
+.burger.on span:nth-child(2){opacity:0}
+.burger.on span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg)}
+@media(min-width:920px){.burger{display:none}}
+
+.overlay{position:fixed;inset:0;z-index:850;background:rgba(26,26,26,.4);backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .35s}
+.overlay.open{opacity:1;pointer-events:auto}
+.drawer-left{position:fixed;top:0;left:0;bottom:0;width:min(100%,360px);background:var(--bg);z-index:860;padding:calc(var(--hh) + 20px) 28px 32px;transform:translateX(-105%);transition:transform .5s var(--ease);box-shadow:var(--shadow2)}
+.drawer-left.open{transform:none}
+.drawer-left a{display:block;font-family:var(--font-d);font-size:28px;padding:12px 0;border-bottom:1px solid var(--line);transition:color .25s,padding-left .25s}
+.drawer-left a:hover{color:var(--marsala);padding-left:8px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:16px 30px;border-radius:999px;font-size:14px;font-weight:600;letter-spacing:.03em;transition:transform .3s var(--ease),box-shadow .3s,background .25s,color .25s;border:none}
+.btn-primary{background:var(--marsala);color:#fff;box-shadow:0 12px 36px rgba(138,40,70,.28)}
+.btn-primary:hover{background:var(--marsala2);transform:translateY(-2px)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#C49A2A);color:#1A1A1A;box-shadow:0 12px 32px rgba(212,175,55,.35)}
+.btn-gold:hover{transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--marsala);border:1.5px solid rgba(138,40,70,.22)}
+.btn-ghost:hover{background:rgba(138,40,70,.06)}
+.btn-full{width:100%}
+.btn-sm{padding:11px 18px;font-size:12px}
+
+/* Hero */
+.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;padding:calc(var(--hh) + 28px) 0 64px;overflow:hidden;background:url('https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.4) 0%,rgba(0,0,0,.2) 50%,rgba(255,255,255,.3) 100%);pointer-events:none}
+.hero-content{position:relative;z-index:2;max-width:780px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#fff;margin-bottom:18px;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--gold)}
+.hero h1{font-family:var(--font-d);font-size:clamp(3.2rem,10.5vw,8rem);font-weight:800;line-height:.92;letter-spacing:-.03em;margin-bottom:18px;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.7)}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero-sub{font-size:clamp(15px,2vw,17px);color:#fff;max-width:440px;line-height:1.7;margin-bottom:28px;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.hero-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.hero-meta{display:flex;flex-wrap:wrap;gap:18px;margin-top:28px;color:#fff;font-size:13px;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+.hero-meta strong{color:#fff;font-weight:600}
+.btn-ghost{background:rgba(255,255,255,.25);color:#fff;border:1.5px solid rgba(255,255,255,.5);backdrop-filter:blur(10px)}
+.btn-ghost:hover{background:rgba(255,255,255,.35);color:#fff;border-color:rgba(255,255,255,.7)}
+
+/* Marquee */
+.marquee{padding:22px 0;overflow:hidden;border-block:1px solid var(--line);background:linear-gradient(90deg,rgba(200,214,229,.3),rgba(240,248,255,.8),rgba(230,230,250,.3))}
+.marquee-track{display:flex;width:max-content;animation:mq 36s linear infinite;will-change:transform}
+.marquee-track span{font-family:var(--font-d);font-size:clamp(1.4rem,3vw,2.3rem);font-style:italic;padding:0 22px;color:var(--marsala);white-space:nowrap}
+.marquee-track .o{color:transparent;-webkit-text-stroke:1px rgba(0,0,0,.15)}
+.marquee-track .d{color:var(--cyan);font-style:normal;padding:0 6px}
+@keyframes mq{to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.marquee-track{animation:none}}
+
+.section{padding:120px 0}
+.section-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:16px;margin-bottom:48px}
+.sec-eye{font-size:10px;font-weight:800;letter-spacing:.25em;text-transform:uppercase;color:var(--magenta);margin-bottom:12px}
+.sec-title{font-family:var(--font-b);font-size:clamp(2.5rem,5.5vw,4rem);font-weight:800;letter-spacing:-.02em;line-height:1.05;background:linear-gradient(45deg,var(--marsala),var(--plum));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-title em{font-style:normal;color:var(--gold);-webkit-text-fill-color:var(--gold)}
+
+/* Bento — 3D tilt */
+.bento{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(160px,auto);gap:12px}
+@media(min-width:900px){
+  .bento{grid-template-columns:repeat(12,1fr);grid-auto-rows:210px;gap:16px}
+  .b1{grid-column:span 5;grid-row:span 2}
+  .b2{grid-column:span 7}
+  .b3{grid-column:span 4;grid-row:span 2}
+  .b4{grid-column:span 3}
+  .b5{grid-column:span 5}
+  .b6{grid-column:span 7}
+}
+.bento-card{position:relative;border-radius:var(--r);overflow:hidden;min-height:170px;isolation:isolate;box-shadow:var(--shadow);background:linear-gradient(145deg,#c9b8b8,#8a6a72 50%,#5a3545);transform:translateZ(0);transform-style:preserve-3d;perspective:1000px}
+.bento-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
+.bento-card:hover img{transform:scale(1.07)}
+.bento-card .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.5));pointer-events:none}
+.bento-body{position:absolute;left:0;right:0;bottom:0;padding:20px;z-index:2;color:#fff;transform:translateZ(20px)}
+.bento-body h3{font-family:var(--font-d);font-size:clamp(1.25rem,2vw,1.85rem);font-weight:700;margin-bottom:10px;text-shadow:0 2px 4px rgba(0,0,0,.8)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.16);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.28);transition:background .3s,color .3s,transform .3s;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.bento-card:hover .pill{background:var(--gold);color:var(--text);border-color:transparent;transform:translateX(3px)}
+
+/* Benefits */
+.benefits{background:linear-gradient(180deg,transparent,rgba(200,214,229,.2),transparent)}
+.bgrid{display:grid;gap:20px}
+@media(min-width:700px){.bgrid{grid-template-columns:1fr 1fr}}
+@media(min-width:1100px){.bgrid{grid-template-columns:repeat(4,1fr)}}
+.bcard{background:var(--white);border:1px solid var(--line);border-radius:24px;padding:36px 28px;box-shadow:0 8px 24px rgba(0,0,0,.04);transition:transform .4s var(--ease),box-shadow .4s}
+.bcard:hover{transform:translateY(-8px);box-shadow:var(--shadow)}
+.bico{width:56px;height:56px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,var(--lilac),#fff);color:var(--marsala);margin-bottom:20px;transition:transform .35s,background .3s,color .3s}
+.bcard:hover .bico{transform:rotate(-6deg) scale(1.08);background:linear-gradient(145deg,var(--magenta),var(--cyan));color:#fff}
+.bico svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.bcard h3{font-family:var(--font-b);font-size:18px;font-weight:700;margin-bottom:10px;line-height:1.3}
+.bcard p{font-size:14px;color:var(--soft);line-height:1.7}
+
+/* Catalog */
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+.fchip{padding:12px 20px;border-radius:999px;font-size:13px;font-weight:600;border:1px solid var(--line);color:var(--soft);background:rgba(255,255,255,.85);transition:.25s}
+.fchip:hover,.fchip.active{background:linear-gradient(135deg,var(--marsala),var(--plum));color:#fff;border-color:transparent}
+.products{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(min-width:800px){.products{grid-template-columns:repeat(3,1fr);gap:24px}}
+@media(min-width:1200px){.products{grid-template-columns:repeat(4,1fr)}}
+.pcard{background:var(--white);border-radius:24px;overflow:hidden;border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.04);display:flex;flex-direction:column;transition:box-shadow .35s;transform-style:preserve-3d;perspective:1000px}
+.pcard:hover{box-shadow:var(--shadow2)}
+.pmedia{position:relative;aspect-ratio:1/1.05;overflow:hidden;background:linear-gradient(145deg,var(--lilac),#fff 55%,var(--bg2))}
+.pmedia img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--ease)}
+.pmedia::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1),rgba(0,0,0,.3));pointer-events:none}
+.pcard:hover .pmedia img{transform:scale(1.05)}
+.pbadge{position:absolute;top:12px;left:12px;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.95);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--marsala);z-index:3}
+.pinfo{padding:18px 18px 20px;display:flex;flex-direction:column;gap:14px;flex:1;transform:translateZ(10px)}
+.pinfo h3{font-size:15px;font-weight:600;line-height:1.4;min-height:2.6em}
+.pbot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto}
+.price{font-family:var(--font-b);font-size:clamp(20px,2.4vw,26px);color:var(--marsala);font-weight:700}
+.add{width:48px;height:48px;border-radius:50%;background:var(--text);color:#fff;display:grid;place-items:center;transition:transform .2s,background .2s}
+.add:hover{background:linear-gradient(135deg,var(--marsala),var(--plum));transform:scale(1.08)}
+.add.ok{background:var(--gold);color:var(--text)}
+.add svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.load-more-wrapper{text-align:center;margin-top:32px}
+.load-more{padding:14px 32px;border-radius:999px;background:var(--white);border:1.5px solid var(--line);color:var(--marsala);font-size:14px;font-weight:600;transition:.25s}
+.load-more:hover{background:var(--marsala);color:#fff;border-color:var(--marsala);transform:translateY(-2px);box-shadow:0 8px 24px rgba(138,40,70,.2)}
+.load-more.hidden{display:none}
+
+/* Calc + Form split */
+.split{display:grid;gap:20px}
+@media(min-width:980px){.split{grid-template-columns:1.05fr .95fr;gap:24px;align-items:stretch}}
+.panel{background:linear-gradient(145deg,#fff,#F0F8FF);border:1px solid var(--line);border-radius:30px;padding:28px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+@media(min-width:700px){.panel{padding:40px}}
+.panel::before{content:'';position:absolute;top:-70px;right:-50px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(200,214,229,.5),transparent 70%);pointer-events:none}
+.panel h2{font-family:var(--font-d);font-size:clamp(1.8rem,3.5vw,2.6rem);font-weight:500;line-height:1.15;margin-bottom:10px;position:relative}
+.panel h2 em{font-style:italic;color:var(--marsala)}
+.panel > p{color:var(--soft);font-size:14px;line-height:1.65;margin-bottom:22px;position:relative;max-width:360px}
+.glabel{display:block;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.chip{padding:12px 18px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.85);font-size:13px;font-weight:500;transition:.25s}
+.chip:hover{border-color:rgba(138,40,70,.35);color:var(--marsala)}
+.chip.on{background:var(--marsala);color:#fff;border-color:var(--marsala);box-shadow:0 8px 22px rgba(138,40,70,.22)}
+.total{display:flex;justify-content:space-between;align-items:end;padding-top:18px;margin:4px 0 18px;border-top:1px solid var(--line)}
+.total span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-bottom:6px}
+.total strong{font-family:var(--font-d);font-size:clamp(2rem,3.5vw,2.8rem);font-weight:500;color:var(--marsala);line-height:1}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--soft);margin-bottom:6px}
+.field input,.field select,.field textarea{
+  width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line);
+  background:rgba(255,255,255,.9);color:var(--text);outline:none;transition:border-color .25s,box-shadow .25s
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:rgba(138,40,70,.4);box-shadow:0 0 0 3px rgba(138,40,70,.1)}
+.field textarea{min-height:96px;resize:vertical}
+.form-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+/* Reviews */
+.reviews{display:grid;gap:14px}
+@media(min-width:800px){.reviews{grid-template-columns:repeat(3,1fr)}}
+.rev{background:var(--white);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 8px 22px rgba(96,39,73,.04)}
+.stars{color:var(--gold);letter-spacing:2px;margin-bottom:12px;font-size:14px}
+.rev p{font-size:14px;color:var(--soft);line-height:1.7;margin-bottom:16px}
+.rev b{font-size:13px;color:var(--text)}
+.rev span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Footer */
+.footer{padding:80px 0 48px;border-top:1px solid var(--line);background:linear-gradient(180deg,transparent,rgba(200,214,229,.25))}
+.fgrid{display:grid;gap:40px;margin-bottom:48px}
+@media(min-width:800px){.fgrid{grid-template-columns:1.4fr 1fr 1fr;gap:48px}}
+.fbrand{font-family:var(--font-b);font-size:32px;font-weight:800;background:linear-gradient(45deg,var(--marsala),var(--plum));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.fbrand em{font-style:normal;-webkit-text-fill-color:var(--gold)}
+.footer p{color:var(--soft);font-size:15px;line-height:1.75;max-width:360px}
+.footer h4{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+.flink a,.fcontacts a,.fcontacts p{display:block;font-size:16px;margin-bottom:12px;transition:color .2s}
+.flink a:hover,.fcontacts a:hover{color:var(--marsala)}
+.ms{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.ms a{padding:12px 20px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:700;transition:.25s}
+.ms a:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.fbot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;padding-top:22px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+
+/* Cart drawer */
+.cart-ov{position:fixed;inset:0;z-index:950;background:rgba(26,26,26,.42);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:opacity .35s}
+.cart-ov.open{opacity:1;pointer-events:auto}
+.cart{position:fixed;top:0;right:0;bottom:0;width:min(100%,420px);background:var(--bg);z-index:960;display:flex;flex-direction:column;transform:translateX(105%);transition:transform .5s var(--ease);box-shadow:-16px 0 50px rgba(96,39,73,.12)}
+.cart.open{transform:none}
+.cart-h{display:flex;justify-content:space-between;align-items:center;padding:24px 24px 16px;border-bottom:1px solid var(--line)}
+.cart-h h3{font-family:var(--font-d);font-size:26px;font-weight:500}
+.cart-items{flex:1;overflow:auto;padding:8px 24px;-webkit-overflow-scrolling:touch}
+.cart-empty{text-align:center;padding:50px 16px;color:var(--muted);font-size:14px}
+.citem{display:grid;grid-template-columns:68px 1fr auto;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.cimg{width:68px;height:68px;border-radius:14px;overflow:hidden;background:var(--bg2)}
+.cimg img{width:100%;height:100%;object-fit:cover}
+.cinfo h4{font-size:13px;font-weight:500;margin-bottom:3px}
+.cinfo p{font-family:var(--font-d);font-size:17px;color:var(--marsala)}
+.qty{display:flex;align-items:center;gap:7px}
+.qbtn{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;display:grid;place-items:center;font-size:15px}
+.qbtn:hover{background:var(--marsala);color:#fff;border-color:var(--marsala)}
+.cart-f{padding:20px 24px 28px;border-top:1px solid var(--line);background:rgba(255,255,255,.7);backdrop-filter:blur(10px)}
+.csum{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px}
+.csum span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.csum strong{font-family:var(--font-d);font-size:30px;color:var(--marsala);font-weight:500}
+
+/* Checkout Modal */
+.checkout-modal-ov{position:fixed;inset:0;z-index:970;background:rgba(26,26,26,.5);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s}
+.checkout-modal-ov.open{opacity:1;pointer-events:auto}
+.checkout-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.95);background:var(--bg);border-radius:30px;padding:36px 32px;max-width:440px;width:calc(100% - 32px);z-index:980;box-shadow:var(--shadow2);opacity:0;pointer-events:none;transition:opacity .35s,transform .35s var(--ease)}
+.checkout-modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.checkout-modal h3{font-family:var(--font-d);font-size:26px;font-weight:500;color:var(--marsala);margin-bottom:8px;text-align:center}
+.checkout-modal p{color:var(--soft);font-size:14px;text-align:center;margin-bottom:28px}
+.messenger-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.messenger-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 16px;border-radius:20px;border:1.5px solid var(--line);background:var(--white);transition:.25s}
+.messenger-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.messenger-btn svg{width:32px;height:32px}
+.messenger-btn span{font-size:13px;font-weight:600;color:var(--text)}
+.messenger-btn.whatsapp{border-color:rgba(37,211,102,.3)}
+.messenger-btn.whatsapp:hover{border-color:#25D366;background:rgba(37,211,102,.05)}
+.messenger-btn.whatsapp svg{color:#25D366}
+.messenger-btn.telegram{border-color:rgba(0,136,204,.3)}
+.messenger-btn.telegram:hover{border-color:#0088CC;background:rgba(0,136,204,.05)}
+.messenger-btn.telegram svg{color:#0088CC}
+.messenger-btn.vk{border-color:rgba(76,117,163,.3)}
+.messenger-btn.vk:hover{border-color:#4C75A3;background:rgba(76,117,163,.05)}
+.messenger-btn.vk svg{color:#4C75A3}
+.messenger-btn.max{border-color:rgba(138,40,70,.3)}
+.messenger-btn.max:hover{border-color:var(--marsala);background:rgba(138,40,70,.05)}
+.messenger-btn.max svg{color:var(--marsala)}
+.modal-close{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:var(--muted);transition:.25s}
+.modal-close:hover{background:rgba(26,26,26,.06);color:var(--text)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);z-index:990;padding:12px 22px;border-radius:999px;background:var(--text);color:#fff;font-size:13px;font-weight:500;box-shadow:var(--shadow2);transition:transform .45s var(--ease);white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
+.toast.show{transform:translate(-50%,0)}
+
+.reveal{opacity:1}
+.js .reveal{opacity:0;transform:translateY(36px)}
+.js .reveal.in{opacity:1;transform:none}
+
+/* FAB — Single expandable button */
+.fab{position:fixed;right:24px;bottom:24px;z-index:800;display:flex;flex-direction:column;gap:12px;align-items:flex-end}
+.fab-trigger{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.2);transition:transform .3s var(--ease),box-shadow .3s;background:linear-gradient(135deg,var(--marsala),var(--plum));cursor:pointer}
+.fab-trigger:hover{transform:scale(1.1);box-shadow:0 16px 50px rgba(0,0,0,.25)}
+.fab-trigger svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2}
+.fab-menu{display:flex;flex-direction:column;gap:10px;align-items:flex-end;opacity:0;visibility:hidden;transform:translateY(20px);transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s}
+.fab-menu.open{opacity:1;visibility:visible;transform:translateY(0)}
+.fab-menu a{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.15);transition:transform .25s,box-shadow .25s}
+.fab-menu a:hover{transform:scale(1.08);box-shadow:0 12px 32px rgba(0,0,0,.2)}
+.fab-menu a svg{width:24px;height:24px}
+.fab-menu .wa{background:#25D366}
+.fab-menu .wa svg{fill:#fff}
+.fab-menu .tg{background:#0088CC}
+.fab-menu .tg svg{fill:#fff}
+.fab-menu .vk{background:#4C75A3}
+.fab-menu .vk svg{fill:#fff}
+.fab-menu .max{background:var(--marsala)}
+.fab-menu .max svg{fill:#fff}
+
+@media(max-width:600px){
+  .pinfo h3{min-height:auto;font-size:13px}
+  .price{font-size:18px}
+  .add{width:38px;height:38px}
+  .hero{align-items:center;padding-bottom:48px}
+  .fab{right:16px;bottom:16px;gap:10px}
+  .fab a{width:50px;height:50px}
+  .fab a svg{width:22px;height:22px}
+}
+</style>
+</head>
+<body>
+<div class="loader" id="loader" aria-hidden="true">
+  <div>
+    <div class="loader-mark">Коли<em>бри</em></div>
+    <div class="loader-bar"><i></i></div>
+  </div>
+</div>
+<div class="cursor-dot" id="cDot"></div>
+<div class="cursor-ring" id="cRing"></div>
+<div class="ambient" aria-hidden="true"><div class="blob a"></div><div class="blob b"></div></div>
+
+<div class="page">
+<header class="header" id="header">
+  <div class="container header-inner">
+    <a href="#hero" class="logo">КОЛИБРИ Студия декора и праздника</a>
+    <nav class="nav-desk" aria-label="Меню">
+      <a href="#categories">Категории</a>
+      <a href="#catalog">Каталог</a>
+      <a href="#order">Заявка</a>
+      <a href="#contacts">Контакты</a>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+      <button class="icon-btn" id="openCart" aria-label="Корзина">
+        <svg viewBox="0 0 24 24"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 016 0"/></svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="icon-btn" id="openCallback" aria-label="Заказать звонок">
+        <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.5-1.1a2 2 0 012.1-.4c.8.3 1.7.5 2.6.6a2 2 0 011.7 2z"/></svg>
+      </button>
+      <a class="btn btn-primary btn-sm magnetic" href="#order" id="hdrCta" style="display:none">Заявка</a>
+    </div>
+  </div>
+</header>
+
+<div class="overlay" id="navOv"></div>
+<nav class="drawer-left" id="navDrawer">
+  <a href="#categories" data-close-nav>Категории</a>
+  <a href="#catalog" data-close-nav>Каталог</a>
+  <a href="#calc" data-close-nav>Калькулятор</a>
+  <a href="#order" data-close-nav>Онлайн-заявка</a>
+  <a href="#reviews" data-close-nav>Отзывы</a>
+  <a href="#contacts" data-close-nav>Контакты</a>
+  <p style="margin-top:28px;color:var(--soft);font-size:14px;line-height:1.8">г. Ачинск, ул. Красноярская, 30, офис 8<br><a href="tel:+79676179721" style="color:var(--marsala);font-weight:600">+7 (967) 617-97-21</a></p>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="container hero-content">
+    <p class="eyebrow">Студия декора · Ачинск</p>
+    <h1>СОЗДАЕМ<br><em>ЭМОЦИИ</em></h1>
+    <p class="hero-sub">Дуем шары и создаём воздушные истории. Фотозоны, свадьбы, выписки, выпускные и композиции — с душой и доставкой по Ачинску.</p>
+    <div class="hero-row">
+      <a href="#catalog" class="btn btn-primary magnetic">Смотреть каталог</a>
+      <a href="#order" class="btn btn-ghost magnetic">Оставить заявку</a>
+    </div>
+    <div class="hero-meta">
+      <div><strong>5.0</strong> на Яндекс Картах</div>
+      <div><strong>1.2K+</strong> работ в портфолио</div>
+      <div>до <strong>22:00</strong></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>Гелиевые шары</span><span class="d">✦</span><span class="o">Фотозоны</span><span class="d">✦</span>
+    <span>Выписки</span><span class="d">✦</span><span class="o">Свадьбы</span><span class="d">✦</span>
+    <span>Выпускные</span><span class="d">✦</span><span class="o">Каркасные цифры</span><span class="d">✦</span>
+    <span>Коробка-сюрприз</span><span class="d">✦</span><span class="o">Аэромозаика</span><span class="d">✦</span>
+    <span>Гелиевые шары</span><span class="d">✦</span><span class="o">Фотозоны</span><span class="d">✦</span>
+    <span>Выписки</span><span class="d">✦</span><span class="o">Свадьбы</span><span class="d">✦</span>
+    <span>Выпускные</span><span class="d">✦</span><span class="o">Каркасные цифры</span><span class="d">✦</span>
+    <span>Коробка-сюрприз</span><span class="d">✦</span><span class="o">Аэромозаика</span><span class="d">✦</span>
+  </div>
+</div>
+
+<section class="section" id="categories">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="sec-eye reveal">Категории как в нашей VK</p>
+        <h2 class="sec-title reveal">Всё для<br><em>вашего праздника</em></h2>
+      </div>
+      <a href="#catalog" class="btn btn-ghost btn-sm reveal">Весь каталог</a>
+    </div>
+    <div class="bento">
+      <a href="#catalog" class="bento-card b1 tilt-card" data-filter="latex">
+        <img src="shary.jpg" alt="Латексные и гелиевые шары" loading="lazy" width="1000" height="1200" onerror="this.remove()">
+        <div class="shade"></div>
+        <div class="bento-body"><h3>Гелиевые и латексные шары</h3><span class="pill">Смотреть каталог →</span></div>
+      </a>
+      <a href="#catalog" class="bento-card b2 tilt-card" data-filter="latex">
+        <img src="cifra.jpg" alt="Фольгированные шары и цифры" loading="lazy" width="1200" height="800" onerror="this.remove()">
+        <div class="shade"></div>
+        <div class="bento-body"><h3>Фольгированные шары и цифры</h3><span class="pill">Смотреть каталог →</span></div>
+      </a>
+      <a href="#catalog" class="bento-card b3 tilt-card" data-filter="latex">
+        <img src="cifra.jpg" alt="Каркасные цифры с подсветкой" loading="lazy" width="900" height="1200" onerror="this.remove()">
+        <div class="shade"></div>
+        <div class="bento-body"><h3>Каркасные цифры с подсветкой</h3><span class="pill">Смотреть каталог →</span></div>
+      </a>
+      <a href="#catalog" class="bento-card b4 tilt-card" data-filter="event">
+        <img src="wings.jpg" alt="Фотозоны" loading="lazy" width="800" height="800" onerror="this.remove()">
+        <div class="shade"></div>
+        <div class="bento-body"><h3>Фотозоны</h3><span class="pill">Смотреть →</span></div>
+      </a>
+      <a href="#catalog" class="bento-card b5 tilt-card" data-filter="event">
+        <img src="hero.jpg" alt="Свадебный декор" loading="lazy" width="1000" height="700" onerror="this.remove()">
+        <div class="shade"></div>
+        <div class="bento-body"><h3>Свадебный декор</h3><span class="pill">Смотреть →</span></div>
+      </a>
+      <a href="#catalog" class="bento-card b6 tilt-card" data-filter="event">
+        <img src="vypusk.jpg" alt="Выписка и годик" loading="lazy" width="1200" height="800" onerror="this.remove()">
+        <div class="shade"></div>
+        <div class="bento-body"><h3>Выписка и годик</h3><span class="pill">Смотреть каталог →</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section benefits" id="benefits">
+  <div class="container">
+    <div class="section-head" style="justify-content:center;text-align:center">
+      <div>
+        <p class="sec-eye reveal">Почему Колибри</p>
+        <h2 class="sec-title reveal">Пусть каждый день<br><em>будет особенным</em></h2>
+      </div>
+    </div>
+    <div class="bgrid">
+      <article class="bcard reveal"><div class="bico"><svg viewBox="0 0 24 24"><path d="M12 3l2.2 4.5L19 8.2l-3.5 3.4.8 4.9L12 14.3 7.7 16.5l.8-4.9L5 8.2l4.8-.7L12 3z"/></svg></div><h3>Только наши работы</h3><p>В портфолио — реальные заказы из Ачинска: выписки, годики, свадьбы и выпускные.</p></article>
+      <article class="bcard reveal"><div class="bico"><svg viewBox="0 0 24 24"><path d="M20.8 5.6a4.5 4.5 0 00-6.4 0L12 8l-2.4-2.4a4.5 4.5 0 00-6.4 6.4l2.4 2.4L12 21l6.4-6.4 2.4-2.4a4.5 4.5 0 000-6.4z"/></svg></div><h3>Вкладываем волшебство</h3><p>Супер-эффектная аэромозаика, каркасные цифры с лампочками и фотозона мечты.</p></article>
+      <article class="bcard reveal"><div class="bico"><svg viewBox="0 0 24 24"><path d="M3 7h13l5 5v5a2 2 0 01-2 2H3z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></svg></div><h3>Доставка вовремя</h3><p>Привезём к празднику аккуратно и в срок — гости и дети будут в восторге.</p></article>
+      <article class="bcard reveal"><div class="bico"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg></div><h3>Удобная оплата</h3><p>Наличные, карта, перевод, СБП. Подскажем бюджет и соберём вариант под вас.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="catalog">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="sec-eye reveal">Каталог</p>
+        <h2 class="sec-title reveal">Популярные<br><em>позиции</em></h2>
+      </div>
+    </div>
+    <div class="filters reveal" id="filters">
+      <button type="button" class="fchip active" data-cat="all">Все</button>
+      <button type="button" class="fchip" data-cat="latex">Воздушные шары</button>
+      <button type="button" class="fchip" data-cat="event">Фотозоны и праздники</button>
+    </div>
+    <div class="products" id="products"></div>
+    <div class="load-more-wrapper"><button type="button" class="load-more hidden" id="loadMore">Показать ещё</button></div>
+  </div>
+</section>
+
+<section class="section" id="calc">
+  <div class="container split">
+    <div class="panel reveal" id="calcPanel">
+      <p class="sec-eye">Калькулятор</p>
+      <h2>Соберите<br><em>свой праздник</em></h2>
+      <p>Ориентировочная стоимость. Точную смету подтвердим в переписке — без оплаты на сайте.</p>
+      <label class="glabel">01 / Повод</label>
+      <div class="chips" id="occChips">
+        <button type="button" class="chip" data-val="3500" data-name="День рождения">День рождения</button>
+        <button type="button" class="chip" data-val="7000" data-name="Свадьба">Свадьба</button>
+        <button type="button" class="chip" data-val="4500" data-name="Выписка">Выписка</button>
+        <button type="button" class="chip" data-val="5500" data-name="Выпускной">Выпускной</button>
+      </div>
+      <label class="glabel">02 / Оформление</label>
+      <div class="chips" id="decChips">
+        <button type="button" class="chip" data-val="2500" data-name="Шары">Шары</button>
+        <button type="button" class="chip" data-val="8000" data-name="Фотозона">Фотозона</button>
+        <button type="button" class="chip" data-val="15000" data-name="Зал / президиум">Зал / президиум</button>
+      </div>
+      <div class="total"><span>Ориентир</span><strong id="calcSum">0 ₽</strong></div>
+      <button type="button" class="btn btn-primary btn-full magnetic" id="addCalc">Добавить расчёт в корзину</button>
+    </div>
+
+    <div class="panel reveal" id="order">
+      <p class="sec-eye">Онлайн-заявка</p>
+      <h2>Свяжитесь<br><em>с нами</em></h2>
+      <p>Оставьте заявку — ответим в WhatsApp и поможем собрать идеальный декор.</p>
+      <form id="leadForm" novalidate>
+        <div class="field"><label for="fName">Имя</label><input id="fName" name="name" type="text" placeholder="Как к вам обращаться" required autocomplete="name"></div>
+        <div class="field"><label for="fPhone">Телефон</label><input id="fPhone" name="phone" type="tel" placeholder="+7 (___) ___-__-__" required autocomplete="tel"></div>
+        <div class="field"><label for="fOccasion">Повод</label>
+          <select id="fOccasion" name="occasion">
+            <option value="День рождения">День рождения</option>
+            <option value="Свадьба">Свадьба</option>
+            <option value="Выписка">Выписка</option>
+            <option value="Годик">Годик</option>
+            <option value="Выпускной">Выпускной</option>
+            <option value="Юбилей">Юбилей</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+        <div class="field"><label for="fDate">Дата праздника</label><input id="fDate" name="date" type="date"></div>
+        <div class="field"><label for="fMsg">Пожелания</label><textarea id="fMsg" name="message" placeholder="Цвета, бюджет, адрес доставки…"></textarea></div>
+        <button type="submit" class="btn btn-gold btn-full magnetic" id="leadSubmit">Отправить заказ</button>
+        <p class="form-note">На сайте нет онлайн-оплаты. Мы свяжемся с вами, уточним детали и согласуем удобный способ оплаты.</p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="reviews">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="sec-eye reveal">Отзывы · 5.0</p>
+        <h2 class="sec-title reveal">Нас выбирают<br><em>снова и снова</em></h2>
+      </div>
+      <button class="btn btn-ghost btn-sm reveal" id="openReviewBtn">Оставить отзыв</button>
+    </div>
+    <div class="reviews" id="reviewsList">
+      <article class="rev reveal"><div class="stars">★★★★★</div><p>«Заказывали фотозону на 1 день рождения. Всё подробно объяснили, доставили вовремя до квартиры. Отнеслись с душой — только положительные впечатления!»</p><b>Гость с Яндекс Карт</b><span>Ачинск</span></article>
+      <article class="rev reveal"><div class="stars">★★★★★</div><p>«С выписки племянницы все мероприятия только через любимых Колибри. Когда встал вопрос о свадьбе — сомнений не было. Шары летают долго, размеры радуют!»</p><b>Таисия В.</b><span>Постоянный клиент</span></article>
+      <article class="rev reveal"><div class="stars">★★★★★</div><p>«Оформление свадьбы и юбилея на высшем уровне. Девочки круглосуточно на связи, чуткие и отзывчивые. Фотозона — просто бомба!»</p><b>Прус Наталья</b><span>Яндекс Карты</span></article>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="contacts">
+  <div class="container">
+    <div class="fgrid">
+      <div>
+        <div class="fbrand">КОЛИБРИ Студия декора</div>
+        <p>Студия декора и праздника в Ачинске. Создадим вашу историю: гелиевые шары, фотозоны, свадьбы, выписки и выпускные.</p>
+        <div class="ms">
+          <a href="https://wa.me/79676179721" target="_blank" rel="noopener">WhatsApp</a>
+          <a href="https://t.me/79676179721" target="_blank" rel="noopener">Telegram</a>
+          <a href="https://vk.ru/kolibri_achinsk" target="_blank" rel="noopener">VK группа</a>
+          <a href="https://vk.ru/id789856377" target="_blank" rel="noopener">VK студия</a>
+        </div>
+      </div>
+      <div class="flink">
+        <h4>Навигация</h4>
+        <a href="#categories">Категории</a>
+        <a href="#catalog">Каталог</a>
+        <a href="#order">Онлайн-заявка</a>
+        <a href="#reviews">Отзывы</a>
+      </div>
+      <div class="fcontacts">
+        <h4>Контакты</h4>
+        <p>г. Ачинск, ул. Красноярская, 30, офис 8</p>
+        <a href="tel:+79676179721">+7 (967) 617-97-21</a>
+        <a href="tel:+79059726263">+7 (905) 972-62-63</a>
+        <a href="https://wa.me/79676179721" target="_blank" rel="noopener">Написать в WhatsApp</a>
+      </div>
+    </div>
+    <div class="fbot"><span>© 2026 Студия Колибри · Ачинск</span><span>Создаём воздушные истории</span></div>
+  </div>
+</footer>
+</div>
+
+<div class="fab" aria-label="Быстрая связь">
+  <div class="fab-menu" id="fabMenu">
+    <a class="wa" href="https://wa.me/79676179721?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BE%D1%84%D0%BE%D1%80%D0%BC%D0%BB%D0%B5%D0%BD%D0%B8%D0%B5%20%D0%B2%20%D0%9A%D0%BE%D0%BB%D0%B8%D0%B1%D1%80%D0%B8." target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-.1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a7.4 7.4 0 01-2.2-1.4 8.2 8.2 0 01-1.5-1.9c-.2-.3 0-.4.1-.6l.4-.5.2-.4c.1-.2 0-.4 0-.5l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.5a1.1 1.1 0 00-.8.4 2.6 2.6 0 00-.8 2c0 1.2.9 2.4 1 2.5.2.3 2.1 3.2 5.1 4.4.7.3 1.3.5 1.7.6a4 4 0 001.9.1c.6-.1 1.8-.7 2-1.4s.2-1.3.1-1.4-.2-.2-.5-.3zM12.1 21.2h0a9.2 9.2 0 01-4.7-1.3l-.3-.2-3.5.9.9-3.4-.2-.3a9.2 9.2 0 01-1.4-4.9 9.3 9.3 0 0115.8-6.5 9.2 9.2 0 012.7 6.5 9.3 9.3 0 01-9.3 9.2zm7.9-17a11.1 11.1 0 00-17.9 13.2L1 23l6.1-1.6a11.1 11.1 0 0016.8-9.4 11 11 0 00-3.3-7.9z"/></svg></a>
+    <a class="tg" href="https://t.me/79676179721" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg></a>
+    <a class="vk" href="https://vk.ru/kolibri_achinsk" target="_blank" rel="noopener" aria-label="VKontakte"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.44c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.332-3.202C4.624 10.857 4 8.164 4 7.723c0-.237.102-.458.593-.458h1.744c.44 0 .61.203.78.678.863 2.49 2.3 4.675 2.895 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.372 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.403 2.151-3.572 2.151-3.572.119-.254.322-.491.763-.491h1.744c.525 0 .644.27.525.643-.22 1.017-2.35 4.031-2.35 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.471 2.05.17.49-.085.744-.576.744z"/></svg></a>
+    <a class="max" href="https://vk.ru/id789856377" target="_blank" rel="noopener" aria-label="MAX"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></a>
+  </div>
+  <button class="fab-trigger" id="fabTrigger" aria-label="Мессенджеры"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></button>
+</div>
+
+<div class="cart-ov" id="cartOv"></div>
+<aside class="cart" id="cart" aria-label="Корзина" data-lenis-prevent>
+  <div class="cart-h"><h3>Корзина</h3><button class="icon-btn" id="closeCart" aria-label="Закрыть">✕</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-f">
+    <div class="csum"><span>Итого</span><strong id="cartTotal">0 ₽</strong></div>
+    <button type="button" class="btn btn-gold btn-full magnetic" id="checkoutBtn">Связаться по заказу</button>
+    <p class="form-note" style="text-align:center;margin-top:10px">Откроем выбор мессенджера. Оплата — после согласования.</p>
+  </div>
+</aside>
+
+<div class="checkout-modal-ov" id="checkoutModalOv"></div>
+<div class="checkout-modal" id="checkoutModal" aria-hidden="true">
+  <button class="modal-close" id="closeCheckoutModal" aria-label="Закрыть">✕</button>
+  <h3>Куда отправить заказ?</h3>
+  <p>Выберите удобный мессенджер для связи</p>
+  <div class="messenger-grid">
+    <a class="messenger-btn whatsapp" id="sendWa" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-.1s-.5-.1-.7.1-.8 1-.9 1.2-.3.2-.6.1a7.4 7.4 0 01-2.2-1.4 8.2 8.2 0 01-1.5-1.9c-.2-.3 0-.4.1-.6l.4-.5.2-.4c.1-.2 0-.4 0-.5l-.9-2.1c-.2-.6-.5-.5-.7-.5h-.5a1.1 1.1 0 00-.8.4 2.6 2.6 0 00-.8 2c0 1.2.9 2.4 1 2.5.2.3 2.1 3.2 5.1 4.4.7.3 1.3.5 1.7.6a4 4 0 001.9.1c.6-.1 1.8-.7 2-1.4s.2-1.3.1-1.4-.2-.2-.5-.3zM12.1 21.2h0a9.2 9.2 0 01-4.7-1.3l-.3-.2-3.5.9.9-3.4-.2-.3a9.2 9.2 0 01-1.4-4.9 9.3 9.3 0 0115.8-6.5 9.2 9.2 0 012.7 6.5 9.3 9.3 0 01-9.3 9.2zm7.9-17a11.1 11.1 0 00-17.9 13.2L1 23l6.1-1.6a11.1 11.1 0 0016.8-9.4 11 11 0 00-3.3-7.9z"/></svg>
+      <span>WhatsApp</span>
+    </a>
+    <a class="messenger-btn telegram" id="sendTg" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+      <span>Telegram</span>
+    </a>
+    <a class="messenger-btn vk" id="sendVk" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.44c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.332-3.202C4.624 10.857 4 8.164 4 7.723c0-.237.102-.458.593-.458h1.744c.44 0 .61.203.78.678.863 2.49 2.3 4.675 2.895 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.372 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.403 2.151-3.572 2.151-3.572.119-.254.322-.491.763-.491h1.744c.525 0 .644.27.525.643-.22 1.017-2.35 4.031-2.35 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.471 2.05.17.49-.085.744-.576.744z"/></svg>
+      <span>VKontakte</span>
+    </a>
+    <a class="messenger-btn max" id="sendMax" href="#" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <span>MAX</span>
+    </a>
+  </div>
+</div>
+
+<div class="checkout-modal-ov" id="callbackModalOv"></div>
+<div class="checkout-modal" id="callbackModal" aria-hidden="true">
+  <button class="modal-close" id="closeCallbackModal" aria-label="Закрыть">✕</button>
+  <h3>Заказать звонок</h3>
+  <p>Оставьте номер — мы перезвоним в течение 15 минут</p>
+  <form id="callbackForm" style="display:grid;gap:16px">
+    <div class="field"><label for="cbName">Имя</label><input id="cbName" type="text" placeholder="Как к вам обращаться" required></div>
+    <div class="field"><label for="cbPhone">Телефон</label><input id="cbPhone" type="tel" placeholder="+7 (___) ___-__-__" required></div>
+    <button type="submit" class="btn btn-primary btn-full">Отправить</button>
+  </form>
+</div>
+
+<div class="checkout-modal-ov" id="reviewModalOv"></div>
+<div class="checkout-modal" id="reviewModal" aria-hidden="true">
+  <button class="modal-close" id="closeReviewModal" aria-label="Закрыть">✕</button>
+  <h3>Оставить отзыв</h3>
+  <p>Ваше мнение важно для нас</p>
+  <form id="reviewForm" style="display:grid;gap:16px">
+    <div class="field"><label for="rvName">Имя</label><input id="rvName" type="text" placeholder="Ваше имя" required></div>
+    <div class="field"><label for="rvRating">Оценка</label>
+      <select id="rvRating" required>
+        <option value="">Выберите оценку</option>
+        <option value="5">★★★★★ Отлично</option>
+        <option value="4">★★★★☆ Хорошо</option>
+        <option value="3">★★★☆☆ Нормально</option>
+        <option value="2">★★☆☆☆ Плохо</option>
+        <option value="1">★☆☆☆☆ Ужасно</option>
+      </select>
+    </div>
+    <div class="field"><label for="rvText">Отзыв</label><textarea id="rvText" placeholder="Расскажите о вашем опыте" required style="min-height:80px"></textarea></div>
+    <button type="submit" class="btn btn-primary btn-full">Отправить отзыв</button>
+  </form>
+</div>
+
+<div class="toast" id="toast">Готово</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  'use strict';
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fine = window.matchMedia('(pointer: fine)').matches;
+  var hasGsap = typeof gsap !== 'undefined';
+  var hasST = hasGsap && typeof ScrollTrigger !== 'undefined';
+  var LenisCtor = window.Lenis || null;
+  var lenis = null;
+  var isMobile = window.matchMedia('(max-width: 900px)').matches;
+  var showAll = false;
+  var PRODUCTS = [];
+
+       var FALLBACK_PRODUCTS = [
+    { id:'p1', name:'Связка гелиевых шаров', price:990, cat:'latex', badge:'Хит', img:'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=700&q=70' },
+    { id:'p2', name:'Шар 12" латекс (шт.)', price:45, cat:'latex', badge:'', img:'https://images.unsplash.com/photo-1513201099705-a9746e1e201f?auto=format&fit=crop&w=700&q=70' },
+    { id:'p3', name:'Фольгированное сердце', price:350, cat:'latex', badge:'New', img:'https://images.pexels.com/photos/1729808/pexels-photo-1729808.jpeg?auto=compress&cs=tinysrgb&w=600' },
+    { id:'p4', name:'Фольгированная цифра', price:1200, cat:'latex', badge:'Хит', img:'https://images.pexels.com/photos/3014856/pexels-photo-3014856.jpeg?auto=compress&cs=tinysrgb&w=600' },
+    { id:'p5', name:'Фотозона «Нежность»', price:12000, cat:'event', badge:'Premium', img:'wings.jpg' },
+    { id:'p6', name:'Напольная композиция', price:3200, cat:'event', badge:'', img:'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=700&q=70' },
+    { id:'p7', name:'Выписка / сет для малыша', price:4500, cat:'event', badge:'Топ', img:'vypusk.jpg' },
+    { id:'p8', name:'Оформление годика', price:7800, cat:'event', badge:'', img:'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=700&q=70' },
+    { id:'p9', name:'Коробка-сюрприз', price:4500, cat:'event', badge:'Топ', img:'https://images.pexels.com/photos/1303081/pexels-photo-1303081.jpeg?auto=compress&cs=tinysrgb&w=600' },
+    { id:'p10', name:'Каркасная цифра с подсветкой', price:3500, cat:'event', badge:'Аренда', img:'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=700&q=70' },
+    { id:'p11', name:'Свадебная арка', price:18000, cat:'event', badge:'Premium', img:'hero.jpg' },
+    { id:'p12', name:'Президиум молодожёнов', price:15000, cat:'event', badge:'', img:'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=700&q=70' }
+  ];
+
+  var KEY_CART = 'kolibri_cart_v3';
+  var KEY_CALC = 'kolibri_calc_v3';
+  var cart = [];
+  var calcOcc = 0, calcDec = 0, occName = '', decName = '', filter = 'all';
+
+  try { cart = JSON.parse(localStorage.getItem(KEY_CART)) || []; if (!Array.isArray(cart)) cart = []; } catch (e) { cart = []; }
+  try {
+    var sc = JSON.parse(localStorage.getItem(KEY_CALC));
+    if (sc) { calcOcc = +sc.calcOcc || 0; calcDec = +sc.calcDec || 0; occName = sc.occName || ''; decName = sc.decName || ''; }
+  } catch (e) {}
+
+  function money(n) { return Number(n).toLocaleString('ru-RU') + ' ₽'; }
+  function saveCart() { localStorage.setItem(KEY_CART, JSON.stringify(cart)); }
+  function saveCalc() { localStorage.setItem(KEY_CALC, JSON.stringify({ calcOcc: calcOcc, calcDec: calcDec, occName: occName, decName: decName })); }
+
+  function scrollTo(el) {
+    if (!el) return;
+    if (lenis) lenis.scrollTo(el, { offset: -72, duration: 1.2 });
+    else window.scrollTo({ top: el.getBoundingClientRect().top + window.pageYOffset - 72, behavior: 'smooth' });
+  }
+
+  var header = document.getElementById('header');
+  var burger = document.getElementById('burger');
+  var navOv = document.getElementById('navOv');
+  var navDrawer = document.getElementById('navDrawer');
+  var cartEl = document.getElementById('cart');
+  var cartOv = document.getElementById('cartOv');
+  var productsEl = document.getElementById('products');
+  var toast = document.getElementById('toast');
+  var calcSum = document.getElementById('calcSum');
+  var checkoutModalOv = document.getElementById('checkoutModalOv');
+  var checkoutModal = document.getElementById('checkoutModal');
+  var callbackModalOv = document.getElementById('callbackModalOv');
+  var callbackModal = document.getElementById('callbackModal');
+  var reviewModalOv = document.getElementById('reviewModalOv');
+  var reviewModal = document.getElementById('reviewModal');
+  var loadMoreBtn = document.getElementById('loadMore');
+
+  function lock(on) { document.body.classList.toggle('is-locked', !!on); }
+  function closeNav() { burger.classList.remove('on'); navDrawer.classList.remove('open'); navOv.classList.remove('open'); lock(cartEl.classList.contains('open') || checkoutModal.classList.contains('open') || callbackModal.classList.contains('open') || reviewModal.classList.contains('open')); }
+  function openNav() { closeCart(); closeCheckoutModal(); closeCallbackModal(); closeReviewModal(); burger.classList.add('on'); navDrawer.classList.add('open'); navOv.classList.add('open'); lock(true); }
+  function closeCart() { cartEl.classList.remove('open'); cartOv.classList.remove('open'); lock(navDrawer.classList.contains('open') || checkoutModal.classList.contains('open') || callbackModal.classList.contains('open') || reviewModal.classList.contains('open')); }
+  function openCart() { closeNav(); closeCheckoutModal(); closeCallbackModal(); closeReviewModal(); cartEl.classList.add('open'); cartOv.classList.add('open'); lock(true); }
+  function openCheckoutModal() { closeNav(); closeCart(); closeCallbackModal(); closeReviewModal(); checkoutModalOv.classList.add('open'); checkoutModal.classList.add('open'); lock(true); }
+  function closeCheckoutModal() { checkoutModalOv.classList.remove('open'); checkoutModal.classList.remove('open'); lock(navDrawer.classList.contains('open') || cartEl.classList.contains('open') || callbackModal.classList.contains('open') || reviewModal.classList.contains('open')); }
+  function openCallbackModal() { closeNav(); closeCart(); closeCheckoutModal(); closeReviewModal(); callbackModalOv.classList.add('open'); callbackModal.classList.add('open'); lock(true); }
+  function closeCallbackModal() { callbackModalOv.classList.remove('open'); callbackModal.classList.remove('open'); lock(navDrawer.classList.contains('open') || cartEl.classList.contains('open') || checkoutModal.classList.contains('open') || reviewModal.classList.contains('open')); }
+  function openReviewModal() { closeNav(); closeCart(); closeCheckoutModal(); closeCallbackModal(); reviewModalOv.classList.add('open'); reviewModal.classList.add('open'); lock(true); }
+  function closeReviewModal() { reviewModalOv.classList.remove('open'); reviewModal.classList.remove('open'); lock(navDrawer.classList.contains('open') || cartEl.classList.contains('open') || checkoutModal.classList.contains('open') || callbackModal.classList.contains('open')); }
+
+  burger.addEventListener('click', function () { navDrawer.classList.contains('open') ? closeNav() : openNav(); });
+  navOv.addEventListener('click', closeNav);
+  document.getElementById('openCart').addEventListener('click', openCart);
+  document.getElementById('closeCart').addEventListener('click', closeCart);
+  cartOv.addEventListener('click', closeCart);
+  document.getElementById('closeCheckoutModal').addEventListener('click', closeCheckoutModal);
+  checkoutModalOv.addEventListener('click', closeCheckoutModal);
+  document.getElementById('openCallback').addEventListener('click', openCallbackModal);
+  document.getElementById('closeCallbackModal').addEventListener('click', closeCallbackModal);
+  callbackModalOv.addEventListener('click', closeCallbackModal);
+  document.getElementById('openReviewBtn').addEventListener('click', openReviewModal);
+  document.getElementById('closeReviewModal').addEventListener('click', closeReviewModal);
+  reviewModalOv.addEventListener('click', closeReviewModal);
+  document.querySelectorAll('[data-close-nav]').forEach(function (a) { a.addEventListener('click', closeNav); });
+
+  if (window.matchMedia('(min-width:920px)').matches) {
+    var hdrCta = document.getElementById('hdrCta');
+    if (hdrCta) hdrCta.style.display = 'inline-flex';
+  }
+
+  function tip(t) {
+    toast.textContent = t;
+    toast.classList.add('show');
+    clearTimeout(tip._t);
+    tip._t = setTimeout(function () { toast.classList.remove('show'); }, 2000);
+  }
+
+  function addToCart(name, price, img, id) {
+    var ex = cart.find(function (i) { return i.id === id; });
+    if (ex) ex.qty += 1;
+    else cart.push({ id: id || ('x' + Date.now()), name: name, price: +price, img: img || '', qty: 1 });
+    saveCart(); renderCart(); tip('Добавлено в корзину');
+  }
+
+  window.changeQty = function (i, d) {
+    if (!cart[i]) return;
+    cart[i].qty += d;
+    if (cart[i].qty <= 0) cart.splice(i, 1);
+    saveCart(); renderCart();
+  };
+
+  function renderCart() {
+    var count = cart.reduce(function (s, i) { return s + i.qty; }, 0);
+    var total = cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+    var badge = document.getElementById('cartCount');
+    badge.textContent = String(count);
+    badge.classList.toggle('show', count > 0);
+    document.getElementById('cartTotal').textContent = money(total);
+    var box = document.getElementById('cartItems');
+    if (!cart.length) {
+      box.innerHTML = '<div class="cart-empty">Пока пусто — выберите позиции<br>или оставьте заявку ниже ✨</div>';
+      return;
+    }
+    box.innerHTML = cart.map(function (item, index) {
+      var img = item.img ? '<img src="' + item.img + '" alt="" loading="lazy">' : '<div style="width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(135deg,#E8C4C4,#F3D7D7)">✦</div>';
+      return '<div class="citem"><div class="cimg">' + img + '</div><div class="cinfo"><h4>' + item.name + '</h4><p>' + money(item.price * item.qty) + '</p></div><div class="qty"><button type="button" class="qbtn" onclick="changeQty(' + index + ',-1)">−</button><span>' + item.qty + '</span><button type="button" class="qbtn" onclick="changeQty(' + index + ',1)">+</button></div></div>';
+    }).join('');
+  }
+
+  function renderProducts() {
+    var list = PRODUCTS.filter(function (p) { return filter === 'all' || p.cat === filter; });
+    var displayList = showAll ? list : list.slice(0, 4);
+    productsEl.innerHTML = displayList.map(function (p) {
+      return '<article class="pcard tilt-card" data-name="' + p.name.replace(/"/g, '&quot;') + '">' +
+        '<div class="pmedia">' + (p.badge ? '<span class="pbadge">' + p.badge + '</span>' : '') +
+        '<img src="' + p.img + '" alt="' + p.name.replace(/"/g, '&quot;') + '" loading="lazy" width="700" height="735" onerror="this.style.opacity=0"></div>' +
+        '<div class="pinfo"><h3>' + p.name + '</h3><div class="pbot"><div class="price">' + money(p.price) + '</div>' +
+        '<button type="button" class="add" data-add="' + p.id + '" aria-label="В корзину"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div></div></article>';
+    }).join('') || '<p style="grid-column:1/-1;color:var(--muted);padding:24px 0">В этой категории пока пусто — оставьте заявку, подберём вручную.</p>';
+    
+    if (loadMoreBtn) {
+      loadMoreBtn.classList.toggle('hidden', list.length <= 4 || showAll);
+    }
+    
+    if (hasGsap && !reduced) {
+      initTiltEffect();
+    }
+  }
+
+  loadMoreBtn.addEventListener('click', function () {
+    showAll = true;
+    renderProducts();
+  });
+
+  productsEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-add]');
+    if (!btn) return;
+    var p = PRODUCTS.find(function (x) { return x.id === btn.getAttribute('data-add'); });
+    if (!p) return;
+    addToCart(p.name, p.price, p.img, p.id);
+    btn.classList.add('ok');
+    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>';
+    setTimeout(function () {
+      btn.classList.remove('ok');
+      btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>';
+    }, 1000);
+  });
+
+  document.querySelectorAll('#filters .fchip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('#filters .fchip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      filter = chip.getAttribute('data-cat') || 'all';
+      showAll = false;
+      renderProducts();
+    });
+  });
+
+  var filterMap = { latex: 'latex', foil: 'latex', photo: 'event', wedding: 'event', baby: 'event', ny: 'event', box: 'event', carnival: 'event' };
+  document.querySelectorAll('.bento-card[data-filter]').forEach(function (card) {
+    card.addEventListener('click', function (e) {
+      e.preventDefault();
+      filter = filterMap[card.getAttribute('data-filter')] || 'all';
+      showAll = false;
+      document.querySelectorAll('#filters .fchip').forEach(function (c) {
+        c.classList.toggle('active', c.getAttribute('data-cat') === filter);
+      });
+      renderProducts();
+      scrollTo(document.getElementById('catalog'));
+    });
+  });
+
+  document.getElementById('checkoutBtn').addEventListener('click', function () {
+    if (!cart.length) { tip('Корзина пуста'); return; }
+    var total = cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+    var text = 'Здравствуйте! Хочу связаться по заказу с сайта Колибри:\n\n';
+    cart.forEach(function (i) { text += '• ' + i.name + ' × ' + i.qty + ' — ' + money(i.price * i.qty) + '\n'; });
+    text += '\nИтого (ориентир): ' + money(total) + '\nПрошу связаться для уточнения деталей.';
+    
+    document.getElementById('sendWa').href = 'https://wa.me/79676179721?text=' + encodeURIComponent(text);
+    document.getElementById('sendTg').href = 'https://t.me/79676179721?text=' + encodeURIComponent(text);
+    document.getElementById('sendVk').href = 'https://vk.ru/id789856377';
+    document.getElementById('sendMax').href = 'https://vk.ru/id789856377';
+    
+    openCheckoutModal();
+  });
+
+  function paintCalc() {
+    calcSum.textContent = money(calcOcc + calcDec);
+    if (hasGsap && !reduced) gsap.fromTo(calcSum, { scale: 1.06 }, { scale: 1, duration: 0.25 });
+  }
+  function restoreChips() {
+    document.querySelectorAll('#occChips .chip').forEach(function (c) {
+      if (+c.dataset.val === calcOcc && c.dataset.name === occName) c.classList.add('on');
+    });
+    document.querySelectorAll('#decChips .chip').forEach(function (c) {
+      if (+c.dataset.val === calcDec && c.dataset.name === decName) c.classList.add('on');
+    });
+    calcSum.textContent = money(calcOcc + calcDec);
+  }
+  document.querySelectorAll('#occChips .chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('#occChips .chip').forEach(function (c) { c.classList.remove('on'); });
+      chip.classList.add('on'); calcOcc = +chip.dataset.val; occName = chip.dataset.name; saveCalc(); paintCalc();
+    });
+  });
+  document.querySelectorAll('#decChips .chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('#decChips .chip').forEach(function (c) { c.classList.remove('on'); });
+      chip.classList.add('on'); calcDec = +chip.dataset.val; decName = chip.dataset.name; saveCalc(); paintCalc();
+    });
+  });
+  document.getElementById('addCalc').addEventListener('click', function () {
+    if (!calcOcc && !calcDec) { tip('Выберите параметры'); return; }
+    var parts = [];
+    if (occName) parts.push(occName);
+    if (decName) parts.push(decName);
+    addToCart('Расчёт: ' + parts.join(' + '), calcOcc + calcDec, '', 'calc_' + calcOcc + '_' + calcDec + '_' + occName + '_' + decName);
+    openCart();
+  });
+
+  document.getElementById('leadForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('fName').value.trim();
+    var phone = document.getElementById('fPhone').value.trim();
+    var occasion = document.getElementById('fOccasion').value;
+    var date = document.getElementById('fDate').value;
+    var msg = document.getElementById('fMsg').value.trim();
+    if (!name || !phone) { tip('Укажите имя и телефон'); return; }
+    var text = 'Здравствуйте! Онлайн-заявка с сайта Колибри.\n\n';
+    text += 'Имя: ' + name + '\nТелефон: ' + phone + '\nПовод: ' + occasion + '\n';
+    if (date) text += 'Дата: ' + date + '\n';
+    if (msg) text += 'Пожелания: ' + msg + '\n';
+    if (cart.length) {
+      text += '\nВ корзине:\n';
+      cart.forEach(function (i) { text += '• ' + i.name + ' × ' + i.qty + '\n'; });
+    }
+    text += '\nПрошу связаться со мной.';
+    
+    document.getElementById('sendWa').href = 'https://wa.me/79676179721?text=' + encodeURIComponent(text);
+    document.getElementById('sendTg').href = 'https://t.me/79676179721?text=' + encodeURIComponent(text);
+    document.getElementById('sendVk').href = 'https://vk.ru/id789856377';
+    document.getElementById('sendMax').href = 'https://vk.ru/id789856377';
+    
+    openCheckoutModal();
+  });
+
+  document.getElementById('callbackForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('cbName').value.trim();
+    var phone = document.getElementById('cbPhone').value.trim();
+    if (!name || !phone) { tip('Укажите имя и телефон'); return; }
+    var text = 'Здравствуйте! Прошу перезвонить.\n\nИмя: ' + name + '\nТелефон: ' + phone;
+    window.open('https://wa.me/79676179721?text=' + encodeURIComponent(text), '_blank');
+    closeCallbackModal();
+    tip('Заявка отправлена в WhatsApp');
+  });
+
+  document.getElementById('reviewForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('rvName').value.trim();
+    var rating = document.getElementById('rvRating').value;
+    var text = document.getElementById('rvText').value.trim();
+    if (!name || !rating || !text) { tip('Заполните все поля'); return; }
+    
+    fetch('api.php?type=reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, rating: rating, text: text })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success) {
+        closeReviewModal();
+        tip('Отзыв отправлен на модерацию');
+        document.getElementById('reviewForm').reset();
+        fetchReviews();
+      }
+    })
+    .catch(function() {
+      tip('Ошибка отправки');
+    });
+  });
+
+  function fetchReviews() {
+    fetch('api.php?type=reviews')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var list = document.getElementById('reviewsList');
+        if (Array.isArray(data) && data.length > 0) {
+          list.innerHTML = data.map(function(r) {
+            var stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+            return '<article class="rev reveal"><div class="stars">' + stars + '</div><p>«' + r.text + '»</p><b>' + r.name + '</b><span>' + r.date + '</span></article>';
+          }).join('');
+        }
+      })
+      .catch(function() {});
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var href = a.getAttribute('href');
+      if (!href || href === '#') { e.preventDefault(); return; }
+      var t = document.querySelector(href);
+      if (!t) { e.preventDefault(); return; }
+      e.preventDefault();
+      closeNav();
+      scrollTo(t);
+    });
+  });
+
+  var fabTrigger = document.getElementById('fabTrigger');
+  var fabMenu = document.getElementById('fabMenu');
+  var fabOpen = false;
+  
+  if (fabTrigger && fabMenu) {
+    fabTrigger.addEventListener('click', function() {
+      fabOpen = !fabOpen;
+      fabMenu.classList.toggle('open', fabOpen);
+    });
+    
+    document.addEventListener('click', function(e) {
+      if (fabOpen && !fabTrigger.contains(e.target) && !fabMenu.contains(e.target)) {
+        fabOpen = false;
+        fabMenu.classList.remove('open');
+      }
+    });
+  }
+
+  function onScroll() {
+    var y = lenis ? lenis.scroll : (window.pageYOffset || 0);
+    header.classList.toggle('on', y > 36);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  function initTiltEffect() {
+    if (!hasGsap || isMobile) return;
+    document.querySelectorAll('.tilt-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        var rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var centerX = rect.width / 2;
+        var centerY = rect.height / 2;
+        var rotateX = (y - centerY) / 20;
+        var rotateY = (centerX - x) / 20;
+        gsap.to(card, { rotationX: rotateX, rotationY: rotateY, duration: 0.3, ease: 'power2.out' });
+      });
+      card.addEventListener('mouseleave', function () {
+        gsap.to(card, { rotationX: 0, rotationY: 0, duration: 0.5, ease: 'elastic.out(1,0.5)' });
+      });
+    });
+  }
+
+  function initMagneticButtons() {
+    if (!hasGsap || !fine || isMobile) return;
+    document.querySelectorAll('.magnetic').forEach(function (btn) {
+      btn.addEventListener('mousemove', function (e) {
+        var rect = btn.getBoundingClientRect();
+        var x = e.clientX - rect.left - rect.width / 2;
+        var y = e.clientY - rect.top - rect.height / 2;
+        gsap.to(btn, { x: x * 0.3, y: y * 0.3, duration: 0.3 });
+      });
+      btn.addEventListener('mouseleave', function () {
+        gsap.to(btn, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1,0.4)' });
+      });
+    });
+  }
+
+  function initMotion() {
+    if (hasST) gsap.registerPlugin(ScrollTrigger);
+
+    if (LenisCtor && !reduced) {
+      try {
+        lenis = new LenisCtor({ duration: 1.05, smoothWheel: !isMobile, syncTouch: false, touchMultiplier: 1.4 });
+        if (hasST) lenis.on('scroll', ScrollTrigger.update);
+        lenis.on('scroll', onScroll);
+        if (hasGsap) {
+          gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+          gsap.ticker.lagSmoothing(0);
+        } else {
+          (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(0);
+        }
+      } catch (err) { lenis = null; }
+    }
+
+    if (hasGsap && hasST && !reduced) {
+      document.documentElement.classList.add('js');
+      gsap.utils.toArray('.reveal').forEach(function (el) {
+        gsap.fromTo(el, { opacity: 0, y: 36 }, {
+          opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
+          onStart: function () { el.classList.add('in'); },
+          scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' }
+        });
+      });
+      if (!isMobile) {
+        gsap.to('#heroMedia img', {
+          yPercent: 14, ease: 'none',
+          scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true }
+        });
+      }
+    } else {
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('in'); });
+    }
+
+    if (fine && hasGsap && !reduced) {
+      document.body.classList.add('has-cursor');
+      var dot = document.getElementById('cDot');
+      var ring = document.getElementById('cRing');
+      var mx = 0, my = 0, rx = 0, ry = 0;
+      document.addEventListener('mousemove', function (e) {
+        mx = e.clientX; my = e.clientY;
+        gsap.set(dot, { x: mx, y: my });
+      }, { passive: true });
+      gsap.ticker.add(function () {
+        rx += (mx - rx) * 0.2; ry += (my - ry) * 0.2;
+        gsap.set(ring, { x: rx, y: ry });
+      });
+      document.querySelectorAll('a,button,.chip,.fchip,.bento-card,.pcard,.add').forEach(function (el) {
+        el.addEventListener('mouseenter', function () { document.body.classList.add('is-hover'); });
+        el.addEventListener('mouseleave', function () { document.body.classList.remove('is-hover'); });
+      });
+    }
+
+    initTiltEffect();
+    initMagneticButtons();
+  }
+
+  fetch('api.php')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      PRODUCTS = Array.isArray(data) ? data : [];
+      renderProducts();
+      renderCart();
+      restoreChips();
+      initMotion();
+      onScroll();
+      fetchReviews();
+    })
+    .catch(function(err) {
+      PRODUCTS = FALLBACK_PRODUCTS;
+      renderProducts();
+      renderCart();
+      restoreChips();
+      initMotion();
+      onScroll();
+      fetchReviews();
+    });
+
+  window.addEventListener('load', function () {
+    var loader = document.getElementById('loader');
+    setTimeout(function () { loader.classList.add('hide'); }, reduced ? 100 : 500);
+    setTimeout(function() {
+      if (hasST) ScrollTrigger.refresh();
+    }, 600);
+  });
+});
+</script>
+</body>
+</html>

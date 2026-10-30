@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — Колибри</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF7F5;--bg2:#F3EBE6;--white:#fff;
+  --marsala:#8A2846;--marsala2:#6B1E36;--plum:#602749;
+  --powder:#E8C4C4;--powder2:#F3D7D7;--gold:#D4AF37;
+  --text:#1A1A1A;--soft:#5C5550;--muted:#9A918A;
+  --line:rgba(26,26,26,.08);
+  --shadow:0 18px 50px rgba(96,39,73,.1);
+  --font-d:'Playfair Display',Georgia,serif;
+  --font-b:'Inter',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{border:none;background:none;cursor:pointer}
+img{display:block;max-width:100%;height:auto}
+.container{max-width:1200px;margin:0 auto;padding:32px}
+
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--line)}
+.logo{font-family:var(--font-d);font-size:28px;font-weight:600;color:var(--marsala)}
+.logo em{font-style:italic;color:var(--plum)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border-radius:999px;font-size:14px;font-weight:600;transition:.25s}
+.btn-primary{background:var(--marsala);color:#fff;box-shadow:0 12px 36px rgba(138,40,70,.28)}
+.btn-primary:hover{background:var(--marsala2);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--marsala);border:1.5px solid rgba(138,40,70,.22)}
+.btn-ghost:hover{background:rgba(138,40,70,.06)}
+.btn-danger{background:var(--text);color:#fff}
+.btn-danger:hover{background:var(--marsala)}
+.btn-success{background:#25D366;color:#fff}
+.btn-success:hover{background:#1ebe57}
+.btn-sm{padding:10px 16px;font-size:13px}
+
+.login-overlay{position:fixed;inset:0;background:var(--bg);z-index:100;display:grid;place-items:center}
+.login-box{background:var(--white);padding:40px;border-radius:28px;box-shadow:var(--shadow);max-width:360px;width:calc(100% - 32px)}
+.login-box h2{font-family:var(--font-d);font-size:26px;color:var(--marsala);margin-bottom:20px;text-align:center}
+.login-box input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line);margin-bottom:16px;outline:none}
+.login-box input:focus{border-color:var(--marsala);box-shadow:0 0 0 3px rgba(138,40,70,.1)}
+.login-box .btn{width:100%}
+
+.tabs{display:flex;gap:8px;margin-bottom:24px}
+.tab{padding:12px 20px;border-radius:999px;border:1px solid var(--line);background:var(--white);font-size:14px;font-weight:500;transition:.25s}
+.tab:hover{border-color:rgba(138,40,70,.35);color:var(--marsala)}
+.tab.active{background:var(--marsala);color:#fff;border-color:var(--marsala)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.products-list{display:flex;flex-direction:column;gap:16px}
+.product-card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 24px rgba(96,39,73,.04);display:grid;gap:16px;grid-template-columns:1fr}
+@media(min-width:700px){.product-card{grid-template-columns:68px 1fr auto;align-items:center}}
+.p-thumb{width:68px;height:68px;border-radius:14px;overflow:hidden;background:var(--powder2)}
+.p-thumb img{width:100%;height:100%;object-fit:cover}
+.p-fields{display:grid;gap:12px}
+.p-fields .field{display:grid;gap:6px}
+.p-fields label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.p-fields input,.p-fields select{width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.9);outline:none}
+.p-fields input:focus,.p-fields select:focus{border-color:rgba(138,40,70,.4);box-shadow:0 0 0 3px rgba(138,40,70,.1)}
+.p-actions{display:flex;gap:8px;flex-wrap:wrap}
+.p-actions .btn{font-size:13px;padding:10px 16px}
+
+.reviews-list{display:flex;flex-direction:column;gap:16px}
+.review-card{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 8px 24px rgba(96,39,73,.04)}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.review-name{font-weight:600;font-size:15px}
+.review-rating{color:var(--gold);letter-spacing:2px}
+.review-status{font-size:11px;font-weight:700;text-transform:uppercase;padding:4px 10px;border-radius:99px}
+.review-status.pending{background:var(--powder2);color:var(--marsala)}
+.review-status.approved{background:rgba(37,211,102,.15);color:#25D366}
+.review-text{color:var(--soft);font-size:14px;line-height:1.6;margin-bottom:12px}
+.review-date{font-size:12px;color:var(--muted)}
+.review-actions{display:flex;gap:8px;margin-top:12px}
+
+.actions-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:24px;padding-top:24px;border-top:1px solid var(--line);flex-wrap:wrap}
+.status{font-size:13px;color:var(--muted)}
+.status.success{color:#25D366}
+.status.error{color:var(--marsala)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120px);padding:12px 22px;border-radius:999px;background:var(--text);color:#fff;font-size:13px;font-weight:500;box-shadow:var(--shadow);transition:transform .45s;z-index:200}
+.toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <h2>Коли<em>бри</em></h2>
+    <p style="color:var(--soft);font-size:14px;margin-bottom:20px;text-align:center">Введите пароль и PIN-код</p>
+    <input type="password" id="passwordInput" placeholder="Пароль">
+    <input type="password" id="pinInput" placeholder="PIN-код (4 цифры)" maxlength="4">
+    <button class="btn btn-primary" id="loginBtn">Войти</button>
+  </div>
+</div>
+
+<div class="container" id="adminPanel" style="display:none">
+  <header class="header">
+    <div class="logo">Admin · Коли<em>бри</em></div>
+    <button class="btn btn-ghost btn-sm" id="logoutBtn">Выйти</button>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="products">Товары</button>
+    <button class="tab" data-tab="reviews">Отзывы</button>
+  </div>
+
+  <div class="tab-content active" id="productsTab">
+    <div class="products-list" id="productsList"></div>
+    <div class="actions-bar">
+      <button class="btn btn-primary" id="addBtn">+ Добавить товар</button>
+      <div>
+        <span class="status" id="status"></span>
+        <button class="btn btn-primary" id="saveBtn" style="margin-left:12px">Сохранить изменения</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="reviewsTab">
+    <div class="reviews-list" id="reviewsList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Готово</div>
+
+<script>
+var STORAGE_KEY = 'kolibri_admin_token';
+var API_URL = 'api.php';
+var products = [];
+var reviews = [];
+var sessionToken = '';
+
+function init() {
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    sessionToken = saved;
+    showAdmin();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'grid';
+  }
+}
+
+function showAdmin() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('adminPanel').style.display = 'block';
+  fetchProducts();
+  fetchReviews();
+}
+
+function login() {
+  var password = document.getElementById('passwordInput').value;
+  var pin = document.getElementById('pinInput').value;
+  
+  fetch(API_URL + '?type=login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: password, pin: pin })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      sessionToken = data.token;
+      localStorage.setItem(STORAGE_KEY, data.token);
+      showAdmin();
+    } else {
+      alert('Неверный пароль или PIN');
+    }
+  })
+  .catch(function() {
+    alert('Ошибка соединения');
+  });
+}
+
+function logout() {
+  localStorage.removeItem(STORAGE_KEY);
+  sessionToken = '';
+  location.reload();
+}
+
+function fetchProducts() {
+  fetch(API_URL + '?type=products')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      products = Array.isArray(data) ? data : [];
+      renderProducts();
+    })
+    .catch(function(err) {
+      setStatus('Ошибка загрузки', true);
+    });
+}
+
+function renderProducts() {
+  var list = document.getElementById('productsList');
+  list.innerHTML = products.map(function(p, i) {
+    return '<div class="product-card" data-index="' + i + '">' +
+      '<div class="p-thumb"><img src="' + (p.img || '') + '" alt="" onerror="this.style.opacity=0"></div>' +
+      '<div class="p-fields">' +
+        '<div class="field"><label>Название</label><input type="text" class="p-name" value="' + (p.name || '') + '"></div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">' +
+          '<div class="field"><label>Цена (₽)</label><input type="number" class="p-price" value="' + (p.price || 0) + '"></div>' +
+          '<div class="field"><label>Категория</label><select class="p-cat">' +
+            '<option value="latex" ' + (p.cat === 'latex' ? 'selected' : '') + '>Шары</option>' +
+            '<option value="foil" ' + (p.cat === 'foil' ? 'selected' : '') + '>Фольга</option>' +
+            '<option value="photo" ' + (p.cat === 'photo' ? 'selected' : '') + '>Фотозоны</option>' +
+            '<option value="baby" ' + (p.cat === 'baby' ? 'selected' : '') + '>Выписка/годик</option>' +
+            '<option value="box" ' + (p.cat === 'box' ? 'selected' : '') + '>Коробки и цифры</option>' +
+            '<option value="wedding" ' + (p.cat === 'wedding' ? 'selected' : '') + '>Свадьба</option>' +
+          '</select></div>' +
+        '</div>' +
+        '<div class="field"><label>URL изображения</label><input type="text" class="p-img" value="' + (p.img || '') + '"></div>' +
+        '<div class="field"><label>Загрузить фото</label><input type="file" class="p-upload" accept="image/*" data-index="' + i + '"></div>' +
+        '<div class="field"><label>Бейдж (пусто = без бейджа)</label><input type="text" class="p-badge" value="' + (p.badge || '') + '"></div>' +
+      '</div>' +
+      '<div class="p-actions">' +
+        '<button class="btn btn-danger btn-sm delete-btn">Удалить</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  document.querySelectorAll('.delete-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var card = this.closest('.product-card');
+      var index = parseInt(card.getAttribute('data-index'));
+      if (confirm('Удалить этот товар?')) {
+        products.splice(index, 1);
+        renderProducts();
+      }
+    });
+  });
+
+  document.querySelectorAll('.p-upload').forEach(function(input) {
+    input.addEventListener('change', function() {
+      var file = this.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Файл слишком большой. Максимум 5MB');
+        return;
+      }
+      var formData = new FormData();
+      formData.append('file', file);
+      var index = this.getAttribute('data-index');
+      var imgInput = document.querySelectorAll('.p-img')[index];
+      
+      setStatus('Загрузка...', false);
+      
+      fetch(API_URL + '?action=upload', {
+        method: 'POST',
+        body: formData
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.success) {
+          imgInput.value = data.path;
+          setStatus('', false);
+          showToast('Фото загружено');
+        } else {
+          setStatus('Ошибка загрузки', true);
+        }
+      })
+      .catch(function() {
+        setStatus('Ошибка загрузки', true);
+      });
+    });
+  });
+}
+
+function addProduct() {
+  products.push({
+    id: 'p' + Date.now(),
+    name: 'Новый товар',
+    price: 0,
+    cat: 'latex',
+    badge: '',
+    img: ''
+  });
+  renderProducts();
+}
+
+function saveProducts() {
+  var cards = document.querySelectorAll('.product-card');
+  var newProducts = [];
+  
+  cards.forEach(function(card) {
+    var index = parseInt(card.getAttribute('data-index'));
+    if (products[index]) {
+      newProducts.push({
+        id: products[index].id,
+        name: card.querySelector('.p-name').value,
+        price: parseInt(card.querySelector('.p-price').value) || 0,
+        cat: card.querySelector('.p-cat').value,
+        badge: card.querySelector('.p-badge').value,
+        img: card.querySelector('.p-img').value
+      });
+    }
+  });
+
+  setStatus('Сохранение...', false);
+  
+  fetch(API_URL + '?type=products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Session-Token': sessionToken
+    },
+    body: JSON.stringify(newProducts)
+  })
+  .then(function(r) {
+    if (r.ok) return r.json();
+    throw new Error('Forbidden');
+  })
+  .then(function(data) {
+    products = newProducts;
+    setStatus('Сохранено!', false);
+    showToast('Изменения сохранены');
+  })
+  .catch(function(err) {
+    setStatus('Ошибка сохранения', true);
+  });
+}
+
+function fetchReviews() {
+  fetch(API_URL + '?type=admin_reviews', {
+    headers: { 'X-Session-Token': sessionToken }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    reviews = Array.isArray(data) ? data : [];
+    renderReviews();
+  })
+  .catch(function(err) {
+    console.error('Failed to load reviews:', err);
+  });
+}
+
+function renderReviews() {
+  var list = document.getElementById('reviewsList');
+  if (reviews.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);text-align:center;padding:40px">Нет отзывов</p>';
+    return;
+  }
+  
+  list.innerHTML = reviews.map(function(r) {
+    var stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
+    return '<div class="review-card" data-id="' + r.id + '">' +
+      '<div class="review-header">' +
+        '<span class="review-name">' + r.name + '</span>' +
+        '<span class="review-status ' + r.status + '">' + (r.status === 'approved' ? 'Одобрен' : 'На модерации') + '</span>' +
+      '</div>' +
+      '<div class="review-rating">' + stars + '</div>' +
+      '<p class="review-text">' + r.text + '</p>' +
+      '<div class="review-date">' + r.date + '</div>' +
+      '<div class="review-actions">' +
+        (r.status === 'pending' ? '<button class="btn btn-success btn-sm approve-btn">Одобрить</button>' : '') +
+        '<button class="btn btn-danger btn-sm delete-review-btn">Удалить</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  document.querySelectorAll('.approve-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var card = this.closest('.review-card');
+      var id = card.getAttribute('data-id');
+      approveReview(id);
+    });
+  });
+
+  document.querySelectorAll('.delete-review-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var card = this.closest('.review-card');
+      var id = card.getAttribute('data-id');
+      if (confirm('Удалить отзыв?')) {
+        deleteReview(id);
+      }
+    });
+  });
+}
+
+function approveReview(id) {
+  fetch(API_URL + '?type=approve_review', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Session-Token': sessionToken
+    },
+    body: JSON.stringify({ id: id })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      fetchReviews();
+      showToast('Отзыв одобрен');
+    }
+  });
+}
+
+function deleteReview(id) {
+  fetch(API_URL + '?type=delete_review', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Session-Token': sessionToken
+    },
+    body: JSON.stringify({ id: id })
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(data) {
+    if (data.success) {
+      fetchReviews();
+      showToast('Отзыв удалён');
+    }
+  });
+}
+
+function setStatus(text, isError) {
+  var el = document.getElementById('status');
+  el.textContent = text;
+  el.className = 'status ' + (isError ? 'error' : 'success');
+}
+
+function showToast(text) {
+  var toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(function() { toast.classList.remove('show'); }, 2000);
+}
+
+document.getElementById('loginBtn').addEventListener('click', login);
+document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') document.getElementById('pinInput').focus();
+});
+document.getElementById('pinInput').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') login();
+});
+document.getElementById('logoutBtn').addEventListener('click', logout);
+document.getElementById('addBtn').addEventListener('click', addProduct);
+document.getElementById('saveBtn').addEventListener('click', saveProducts);
+
+document.querySelectorAll('.tab').forEach(function(tab) {
+  tab.addEventListener('click', function() {
+    document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('.tab-content').forEach(function(c) { c.classList.remove('active'); });
+    this.classList.add('active');
+    document.getElementById(this.getAttribute('data-tab') + 'Tab').classList.add('active');
+  });
+});
+
+init();
+</script>
+</body>
+</html>
